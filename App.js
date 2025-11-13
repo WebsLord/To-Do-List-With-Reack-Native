@@ -8,14 +8,11 @@ import {
   View, 
   TextInput, 
   Button,
-  FlatList // Import FlatList / FlatList'i import et
+  FlatList
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
-// Import our new component / Yeni bileşenimizi import edelim
 import TodoItem from './components/TodoItem';
 
-// ... (export default function App() ... state'ler ... ve handler fonksiyonları aynı kalıyor) ...
 export default function App() {
   
   const [enteredTaskText, setEnteredTaskText] = useState('');
@@ -36,13 +33,27 @@ export default function App() {
     setEnteredTaskText('');
   }
 
+  // --- NEW FUNCTION for Part 4 --- / --- Bölüm 4 için YENİ FONKSİYON ---
+  /**
+   * Deletes a task based on its ID.
+   * ID'sine göre bir görevi siler.
+   * @param {string} id - The id of the task to be deleted. / Silinecek görevin ID'si.
+   */
+  function deleteTaskHandler(id) {
+    // We update the state by filtering out the item with the matching id
+    // State'i, eşleşen id'ye sahip elemanı filtreleyerek (dışarıda bırakarak) güncelliyoruz
+    setTasks((currentTasks) => {
+      return currentTasks.filter((task) => task.id !== id);
+    });
+  }
+  
   // --- JSX (RENDER) ---
   return (
     <SafeAreaView style={styles.appContainer}>
       <View style={styles.contentContainer}>
         
         <Text style={styles.title}>Benim Todo Listem</Text> 
-        
+
         {/* --- Input Area --- */}
         <View style={styles.inputContainer}>
           <TextInput 
@@ -57,34 +68,34 @@ export default function App() {
           />
         </View>
 
-        {/* --- List Area --- / --- Liste Alanı --- */}
-        {/* We replace the old View with a new one for the list / Eski View'i liste için yenisiyle değiştiriyoruz */}
+        {/* --- List Area --- */}
         <View style={styles.listContainer}>
-          {/* FlatList component to render our tasks / Görevlerimizi render edecek FlatList bileşeni */}
           <FlatList
-            data={tasks} // The array of data to render / Render edilecek veri dizisi (bizim state'imiz)
+            data={tasks}
             
-            // How to render each item / Her bir elemanın nasıl render edileceği
-            renderItem={({ item }) => ( // 'item' is each object in the 'tasks' array / 'item', 'tasks' dizisindeki her bir objedir
-              <TodoItem text={item.text} /> // Pass the text to our TodoItem component / Metni TodoItem bileşenimize iletiyoruz
+            // --- UPDATED renderItem for Part 4 --- / --- Bölüm 4 için GÜNCELLENEN renderItem ---
+            renderItem={({ item }) => (
+              <TodoItem 
+                text={item.text} // Pass the text / Metni ilet
+                id={item.id} // Pass the id / ID'yi ilet
+                onDelete={deleteTaskHandler} // Pass the delete function / Silme fonksiyonunu ilet
+              />
             )}
             
-            // How to get a unique key for each item / Her eleman için benzersiz bir 'key' nasıl alınır
             keyExtractor={(item) => {
-              return item.id; // Use the 'id' we created / Oluşturduğumuz 'id'yi kullan
+              return item.id;
             }}
-            
-            // What to show when the list is empty / Liste boşken ne gösterilecek
             ListEmptyComponent={<Text style={styles.emptyText}>Henüz görev yok. Bir tane ekle!</Text>}
           />
         </View>
         
-      </View>
+      </View> {/* <-- HATA BURADAYDI, DÜZELTİLDİ / THE ERROR WAS HERE, IT'S FIXED */}
     </SafeAreaView>
   );
 }
 
 // --- STYLING ---
+// (All styles are the same as Part 3) / (Tüm stiller Bölüm 3 ile aynı)
 const styles = StyleSheet.create({
   appContainer: {
     flex: 1, 
@@ -119,16 +130,13 @@ const styles = StyleSheet.create({
     marginRight: 10,
     fontSize: 16,
   },
-
-  // --- NEW STYLES for Part 3 --- / --- Bölüm 3 için YENİ STİLLER ---
-  
   listContainer: {
-    flex: 5, // Give the list container 5 times more space than the input (if input had flex: 1) / Liste alanına daha çok yer ver
+    flex: 5,
   },
   emptyText: {
     textAlign: 'center',
     marginTop: 20,
     fontSize: 16,
-    color: '#888', // A gray color / Gri bir renk
+    color: '#888',
   },
 });
